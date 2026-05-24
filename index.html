@@ -19,7 +19,10 @@ s.parentNode.insertBefore(t,s)}(window, document,'script',
 fbq('init', '968856079448203');
 fbq('track', 'PageView');
 
-// Evento InitiateCheckout ao clicar nos botões de compra
+// ⚠️ InitiateCheckout desabilitado (2026-05-23)
+// Conversões sendo rastreadas via Conversions API (Cloudflare Worker)
+// para evitar deduplicação e melhorar cobertura
+/*
 document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('a[href*="kiwify"]').forEach(function(btn) {
     btn.addEventListener('click', function() {
@@ -32,6 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+*/
 </script>
 <noscript><img height="1" width="1" style="display:none"
 src="https://www.facebook.com/tr?id=968856079448203&ev=PageView&noscript=1"
