@@ -39,16 +39,19 @@ t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
 
-// ⚠️ InitiateCheckout desabilitado (2026-05-23)
-// Conversões sendo rastreadas via Conversions API (Cloudflare Worker)
-// para evitar deduplicação e melhorar cobertura
-/*
+fbq('init', '968856079448203');
+
+// PageView com event_id (permite dedupe se CAPI tambem enviar PageView)
+var pageViewEventId = genEventId();
+fbq('track', 'PageView', {}, { eventID: pageViewEventId });
+
+// ─── 4. InitiateCheckout REATIVADO com event_id (ponte pra CAPI) ───
 document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('a[href*="kiwify"]').forEach(function(btn) {
     btn.addEventListener('click', function(e) {
-      const eventId = genEventId();
-      const fbp = getCookie('_fbp');
-      const fbc = getCookie('_fbc');
+      var eventId = genEventId();
+      var fbp = getCookie('_fbp');
+      var fbc = getCookie('_fbc');
 
       // Dispara InitiateCheckout no browser COM event_id
       fbq('track', 'InitiateCheckout', {
@@ -59,9 +62,9 @@ document.addEventListener('DOMContentLoaded', function() {
         content_ids: ['k-lift-21d']
       }, { eventID: eventId });
 
-      // Passar fbp/fbc/event_id pro Kiwify via UTM (Worker lê e dedupica)
+      // Passar fbp/fbc/event_id pro Kiwify via UTM (Worker le e dedupica)
       try {
-        const url = new URL(btn.href);
+        var url = new URL(btn.href);
         url.searchParams.set('utm_source', 'facebook');
         url.searchParams.set('utm_medium', 'cpc');
         url.searchParams.set('event_id', eventId);
@@ -72,7 +75,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
-*/
 </script>
 <noscript><img height="1" width="1" style="display:none"
 src="https://www.facebook.com/tr?id=968856079448203&ev=PageView&noscript=1"
