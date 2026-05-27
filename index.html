@@ -6,8 +6,30 @@
 <title>🔥 K-LIFT - Pele de Coreana em 21 Dias por R$ 27,90 (de R$ 197)</title>
 <meta name="description" content="O método K-Beauty que está fazendo +47.000 mulheres abandonarem o Botox tradicional. 5 minutos por dia. Sem agulhas. Garantia de 7 dias.">
 
-<!-- Meta Pixel Code -->
+<!-- Meta Pixel Code (FIX 2026-05-26: Advanced Matching + fbclid capture + event_id) -->
 <script>
+// ─── 1. Capturar fbclid do anúncio e gravar _fbc cookie (atribuição) ───
+(function() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const fbclid = params.get('fbclid');
+    if (fbclid && !document.cookie.includes('_fbc=')) {
+      const fbc = 'fb.1.' + Date.now() + '.' + fbclid;
+      document.cookie = '_fbc=' + fbc + ';max-age=7776000;path=/;domain=.k-lift.pages.dev';
+    }
+  } catch(e) {}
+})();
+
+// ─── 2. Helpers para ler cookies fbp/fbc (passar pro Kiwify) ───
+function getCookie(name) {
+  const m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+  return m ? decodeURIComponent(m[1]) : '';
+}
+function genEventId() {
+  return 'klift_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+// ─── 3. Pixel base com Advanced Matching automático ───
 !function(f,b,e,v,n,t,s)
 {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
 n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -16,8 +38,6 @@ n.queue=[];t=b.createElement(e);t.async=!0;
 t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '968856079448203');
-fbq('track', 'PageView');
 
 // ⚠️ InitiateCheckout desabilitado (2026-05-23)
 // Conversões sendo rastreadas via Conversions API (Cloudflare Worker)
@@ -25,13 +45,30 @@ fbq('track', 'PageView');
 /*
 document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('a[href*="kiwify"]').forEach(function(btn) {
-    btn.addEventListener('click', function() {
+    btn.addEventListener('click', function(e) {
+      const eventId = genEventId();
+      const fbp = getCookie('_fbp');
+      const fbc = getCookie('_fbc');
+
+      // Dispara InitiateCheckout no browser COM event_id
       fbq('track', 'InitiateCheckout', {
         value: 27.90,
         currency: 'BRL',
-        content_name: 'K-LIFT Método Coreano 21 Dias',
-        content_type: 'product'
-      });
+        content_name: 'K-LIFT Metodo Coreano 21 Dias',
+        content_type: 'product',
+        content_ids: ['k-lift-21d']
+      }, { eventID: eventId });
+
+      // Passar fbp/fbc/event_id pro Kiwify via UTM (Worker lê e dedupica)
+      try {
+        const url = new URL(btn.href);
+        url.searchParams.set('utm_source', 'facebook');
+        url.searchParams.set('utm_medium', 'cpc');
+        url.searchParams.set('event_id', eventId);
+        if (fbp) url.searchParams.set('fbp', fbp);
+        if (fbc) url.searchParams.set('fbc', fbc);
+        btn.href = url.toString();
+      } catch(err) {}
     });
   });
 });
