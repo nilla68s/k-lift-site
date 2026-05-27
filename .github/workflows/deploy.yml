@@ -1,0 +1,36 @@
+name: Deploy K-LIFT
+
+on:
+  push:
+    branches: [master, main]
+  workflow_dispatch:
+
+jobs:
+  deploy-landing-page:
+    name: Deploy Landing Page (Cloudflare Pages)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: 70fe8d52dfe6cf22e94514eccc8278f5
+          command: pages deploy . --project-name=k-lift --branch=main --commit-dirty=true
+
+  deploy-worker:
+    name: Deploy Worker CAPI (Conversions API)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: 70fe8d52dfe6cf22e94514eccc8278f5
+          workingDirectory: worker
+          command: deploy

@@ -1,0 +1,4 @@
+name = "k-lift-conversions"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+account_id = "70fe8d52dfe6cf22e94514eccc8278f5"

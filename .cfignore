@@ -1,0 +1,6 @@
+.github/
+.wrangler/
+worker/
+node_modules/
+*.md
+copy-completa.md

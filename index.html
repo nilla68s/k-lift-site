@@ -63,13 +63,17 @@ document.addEventListener('DOMContentLoaded', function() {
       }, { eventID: eventId });
 
       // Passar fbp/fbc/event_id pro Kiwify via UTM (Worker le e dedupica)
+      // Kiwify so captura UTMs padrao em TrackingParameters
+      // utm_term  = event_id (dedup com pixel browser)
+      // utm_content = "fbp|fbc" (Worker faz split)
       try {
         var url = new URL(btn.href);
         url.searchParams.set('utm_source', 'facebook');
         url.searchParams.set('utm_medium', 'cpc');
-        url.searchParams.set('event_id', eventId);
-        if (fbp) url.searchParams.set('fbp', fbp);
-        if (fbc) url.searchParams.set('fbc', fbc);
+        url.searchParams.set('utm_term', eventId);
+        if (fbp || fbc) {
+          url.searchParams.set('utm_content', (fbp || '') + '|' + (fbc || ''));
+        }
         btn.href = url.toString();
       } catch(err) {}
     });
